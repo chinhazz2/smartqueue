@@ -1,0 +1,26 @@
+ID,Priority,Story,EstimateHours,AcceptanceSummary,TargetDay
+SQ-001,Must,Khởi tạo repository backend frontend Docker PostgreSQL,4,Health check và database chạy bằng một lệnh,1
+SQ-002,Must,Viết yêu cầu use case và acceptance criteria,4,Ba use case trọng tâm được đặc tả và truy vết,2
+SQ-003,Must,Vẽ domain state sequence architecture ERD,5,Tài liệu nhất quán với backlog và API,3-4
+SQ-004,Must,Đăng ký bệnh nhân,4,Email duy nhất mật khẩu băm validation đầy đủ,5
+SQ-005,Must,Đăng nhập và phân quyền,5,Role sai bị 403 và chưa đăng nhập bị 401,5
+SQ-006,Must,Quản lý bác sĩ và lịch làm việc,5,Admin tạo bác sĩ và lịch không hợp lệ bị từ chối,5
+SQ-007,Must,Sinh slot trống,5,Slot đúng lịch làm việc và loại slot quá khứ/đã đặt,6
+SQ-008,Must,Đặt lịch,6,HTTP 201 khi hợp lệ và 409 khi slot xung đột,6
+SQ-009,Must,Test concurrent booking,4,Hai request cùng slot chỉ một request thành công,6
+SQ-010,Must,Xem lịch bệnh nhân và bác sĩ,4,Chỉ trả dữ liệu theo quyền và có pagination cơ bản,7
+SQ-011,Must,Hủy lịch,3,Chỉ chủ sở hữu/lễ tân hủy được và transition hợp lệ,7
+SQ-012,Must,Đổi lịch,5,Đổi atomically và không mất slot cũ khi thất bại,7
+SQ-013,Must,Check-in và cấp số,5,Một appointment chỉ tạo một queue ticket,8
+SQ-014,Must,Gọi lượt tiếp theo,5,Chọn ticket chờ sớm nhất và không gọi trùng,8
+SQ-015,Must,Hoàn tất hoặc bỏ lượt,3,State transition đúng và audit log được tạo,8
+SQ-016,Must,Frontend đăng nhập và danh sách bác sĩ,6,Người dùng đăng nhập và xem slot,9
+SQ-017,Must,Frontend đặt/hủy/đổi lịch,7,Luồng bệnh nhân end-to-end hoạt động,10
+SQ-018,Must,Frontend hàng đợi cho lễ tân/bác sĩ,7,Check-in gọi lượt và hoàn tất từ UI,11
+SQ-019,Must,Audit log logging và error format,5,Có traceId và không log dữ liệu nhạy cảm,12
+SQ-020,Must,Bổ sung test và security checklist,6,Các test P0 chạy xanh và quyền được kiểm chứng,12
+SQ-021,Must,CI Docker seed data README OpenAPI,7,Clone mới có thể chạy và pipeline xanh,13
+SQ-022,Must,Rà soát release video và interview notes,6,Tag v1.0.0 demo 3-5 phút và 20 câu trả lời,14
+SQ-023,Should,SSE/WebSocket cập nhật queue,6,Queue tự cập nhật hoặc fallback polling,11-13
+SQ-024,Could,Redis cache slot trống,5,Cache có TTL và invalidation đúng,13
+SQ-025,Could,Dashboard thống kê,6,Hiển thị số lượt và thời gian chờ demo,13
