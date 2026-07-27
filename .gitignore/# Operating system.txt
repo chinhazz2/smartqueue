@@ -1,0 +1,26 @@
+# Operating system
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Java
+backend/target/
+backend/.classpath
+backend/.project
+backend/.settings/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Environment variables
+.env
+*.local
+
+# Logs
+*.log
+logs/
