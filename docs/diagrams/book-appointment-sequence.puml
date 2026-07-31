@@ -1,0 +1,61 @@
+@startuml
+
+skinparam shadowing false
+autonumber
+
+title UC-04 Book Appointment Sequence
+
+actor Patient
+boundary "React Frontend" as Frontend
+control "AppointmentController" as Controller
+control "AppointmentService" as Service
+entity "DoctorScheduleRepository" as ScheduleRepository
+entity "AppointmentRepository" as AppointmentRepository
+control "AuditService" as AuditService
+database PostgreSQL
+
+Patient -> Frontend : select doctor and slot
+Patient -> Frontend : submit booking
+
+Frontend -> Controller : POST /api/appointments\n{doctorId, startAt}
+Controller -> Service : book(patientId, doctorId, startAt)
+
+Service -> ScheduleRepository : isAvailable(doctorId, startAt)
+ScheduleRepository -> PostgreSQL : query schedule and time off
+PostgreSQL --> ScheduleRepository : availability result
+ScheduleRepository --> Service : available / unavailable
+
+alt slot outside doctor availability
+    Service --> Controller : invalid slot
+    Controller --> Frontend : HTTP 400
+    Frontend --> Patient : show validation error
+else slot belongs to doctor availability
+    Service -> AppointmentRepository : existsDoctorConflict(...)
+    AppointmentRepository -> PostgreSQL : query doctor overlap
+    PostgreSQL --> AppointmentRepository : true / false
+    AppointmentRepository --> Service : conflict result
+
+    Service -> AppointmentRepository : existsPatientConflict(...)
+    AppointmentRepository -> PostgreSQL : query patient overlap
+    PostgreSQL --> AppointmentRepository : true / false
+    AppointmentRepository --> Service : conflict result
+
+    alt doctor or patient conflict
+        Service --> Controller : booking conflict
+        Controller --> Frontend : HTTP 409
+        Frontend --> Patient : slot is no longer available
+    else no conflict
+        Service -> AppointmentRepository : save(BOOKED appointment)
+        AppointmentRepository -> PostgreSQL : INSERT appointment
+        PostgreSQL --> AppointmentRepository : saved appointment
+
+        Service -> AuditService : record APPOINTMENT_BOOKED
+        AuditService -> PostgreSQL : INSERT audit log
+
+        Service --> Controller : Appointment result
+        Controller --> Frontend : HTTP 201 Created
+        Frontend --> Patient : show booking confirmation
+    end
+end
+
+@enduml

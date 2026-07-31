@@ -1,0 +1,28 @@
+@startuml
+
+skinparam shadowing false
+title QueueTicket State Machine
+
+[*] --> WAITING : appointment checked in
+
+WAITING --> CALLED : doctor calls next
+CALLED --> COMPLETED : service completed
+
+COMPLETED --> [*]
+
+note right of WAITING
+The ticket is eligible
+for call-next.
+end note
+
+note right of CALLED
+The related Appointment
+must be IN_SERVICE.
+end note
+
+note right of COMPLETED
+The related Appointment
+must also be COMPLETED.
+end note
+
+@enduml

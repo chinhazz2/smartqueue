@@ -1,0 +1,133 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+hide empty methods
+
+title SmartQueue Domain Model
+
+enum UserRole {
+    PATIENT
+    RECEPTIONIST
+    DOCTOR
+    ADMINISTRATOR
+}
+
+enum UserStatus {
+    ACTIVE
+    LOCKED
+    DISABLED
+}
+
+enum AppointmentStatus {
+    BOOKED
+    CHECKED_IN
+    IN_SERVICE
+    COMPLETED
+    CANCELLED
+}
+
+enum QueueTicketStatus {
+    WAITING
+    CALLED
+    COMPLETED
+}
+
+class User <<entity>> {
+    +UUID id
+    +String email
+    +String passwordHash
+    +String fullName
+    +String phone
+    +UserRole role
+    +UserStatus status
+    +Instant createdAt
+    +Instant updatedAt
+}
+
+class DoctorProfile <<entity>> {
+    +UUID id
+    +String specialty
+    +boolean active
+    +Instant createdAt
+    +Instant updatedAt
+}
+
+class DoctorSchedule <<entity>> {
+    +UUID id
+    +DayOfWeek dayOfWeek
+    +LocalTime startTime
+    +LocalTime endTime
+    +int slotDurationMinutes
+    +boolean active
+}
+
+class DoctorTimeOff <<entity>> {
+    +UUID id
+    +Instant startAt
+    +Instant endAt
+    +String reason
+}
+
+class Appointment <<entity>> {
+    +UUID id
+    +Instant startAt
+    +Instant endAt
+    +AppointmentStatus status
+    +Instant createdAt
+    +Instant updatedAt
+    +Instant cancelledAt
+}
+
+class QueueTicket <<entity>> {
+    +UUID id
+    +LocalDate queueDate
+    +int queueNumber
+    +QueueTicketStatus status
+    +Instant checkedInAt
+    +Instant calledAt
+    +Instant completedAt
+}
+
+class AuditLog <<entity>> {
+    +UUID id
+    +String action
+    +String entityType
+    +UUID entityId
+    +Instant occurredAt
+    +String details
+}
+
+User --> UserRole
+User --> UserStatus
+Appointment --> AppointmentStatus
+QueueTicket --> QueueTicketStatus
+
+User "1" -- "0..1" DoctorProfile : doctor account
+DoctorProfile "1" -- "0..*" DoctorSchedule : working schedules
+DoctorProfile "1" -- "0..*" DoctorTimeOff : time off
+
+User "1" -- "0..*" Appointment : patient
+DoctorProfile "1" -- "0..*" Appointment : doctor
+
+Appointment "1" -- "0..1" QueueTicket : check-in creates
+DoctorProfile "1" -- "0..*" QueueTicket : owns queue
+
+User "0..1" -- "0..*" AuditLog : actor
+
+note right of Appointment
+Core invariants:
+- no doctor overlap
+- no patient overlap
+- valid doctor schedule
+- valid state transition
+end note
+
+note right of QueueTicket
+Core invariants:
+- one ticket per appointment
+- unique doctor/date/number
+- call smallest WAITING number
+end note
+
+@enduml

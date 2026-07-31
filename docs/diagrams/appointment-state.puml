@@ -1,0 +1,35 @@
+@startuml
+
+skinparam shadowing false
+title Appointment State Machine
+
+[*] --> BOOKED : appointment created
+
+BOOKED --> BOOKED : reschedule\n[new slot is valid]
+BOOKED --> CANCELLED : cancel
+BOOKED --> CHECKED_IN : check in\n[appointment is today]
+
+CHECKED_IN --> IN_SERVICE : doctor calls next
+IN_SERVICE --> COMPLETED : complete service
+
+CANCELLED --> [*]
+COMPLETED --> [*]
+
+note right of BOOKED
+Allowed:
+- reschedule
+- cancel
+- check in
+end note
+
+note right of CHECKED_IN
+A WAITING QueueTicket
+must already exist.
+end note
+
+note right of IN_SERVICE
+The related QueueTicket
+must be CALLED.
+end note
+
+@enduml
