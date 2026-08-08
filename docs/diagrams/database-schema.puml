@@ -1,0 +1,101 @@
+@startuml
+
+hide circle
+skinparam shadowing false
+skinparam linetype ortho
+
+title SmartQueue Relational Database Schema
+
+entity users {
+    * id : UUID <<PK>>
+    --
+    * email : VARCHAR(320) <<UQ>>
+    * password_hash : VARCHAR(255)
+    * full_name : VARCHAR(120)
+    phone : VARCHAR(30)
+    * role : VARCHAR(30)
+    * status : VARCHAR(20)
+    * created_at : TIMESTAMPTZ
+    * updated_at : TIMESTAMPTZ
+}
+
+entity doctor_profiles {
+    * id : UUID <<PK>>
+    --
+    * user_id : UUID <<FK, UQ>>
+    * specialty : VARCHAR(120)
+    * active : BOOLEAN
+    * created_at : TIMESTAMPTZ
+    * updated_at : TIMESTAMPTZ
+}
+
+entity doctor_schedules {
+    * id : UUID <<PK>>
+    --
+    * doctor_id : UUID <<FK>>
+    * day_of_week : SMALLINT
+    * start_time : TIME
+    * end_time : TIME
+    * slot_duration_minutes : SMALLINT
+    * active : BOOLEAN
+}
+
+entity doctor_time_off {
+    * id : UUID <<PK>>
+    --
+    * doctor_id : UUID <<FK>>
+    * start_at : TIMESTAMPTZ
+    * end_at : TIMESTAMPTZ
+    reason : VARCHAR(500)
+}
+
+entity appointments {
+    * id : UUID <<PK>>
+    --
+    * patient_id : UUID <<FK>>
+    * doctor_id : UUID <<FK>>
+    * start_at : TIMESTAMPTZ
+    * end_at : TIMESTAMPTZ
+    * status : VARCHAR(20)
+    * created_at : TIMESTAMPTZ
+    * updated_at : TIMESTAMPTZ
+    cancelled_at : TIMESTAMPTZ
+}
+
+entity queue_tickets {
+    * id : UUID <<PK>>
+    --
+    * appointment_id : UUID <<FK, UQ>>
+    * doctor_id : UUID <<FK>>
+    * queue_date : DATE
+    * queue_number : INTEGER
+    * status : VARCHAR(20)
+    * checked_in_at : TIMESTAMPTZ
+    called_at : TIMESTAMPTZ
+    completed_at : TIMESTAMPTZ
+}
+
+entity audit_logs {
+    * id : UUID <<PK>>
+    --
+    actor_user_id : UUID <<FK>>
+    * action : VARCHAR(100)
+    * entity_type : VARCHAR(100)
+    * entity_id : UUID
+    * occurred_at : TIMESTAMPTZ
+    * details : JSONB
+}
+
+users ||--o| doctor_profiles : doctor account
+doctor_profiles ||--o{ doctor_schedules : schedules
+doctor_profiles ||--o{ doctor_time_off : time off
+
+users ||--o{ appointments : patient
+doctor_profiles ||--o{ appointments : doctor
+
+appointments ||--o| queue_tickets : check-in
+doctor_profiles ||--o{ queue_tickets : queue
+
+users |o--o{ audit_logs : actor
+
+@enduml
